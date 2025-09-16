@@ -9,16 +9,16 @@ public class AiAwsEc2Application {
 		EC2Controller controller = new EC2Controller();
 
 		// Create
-		controller.createEC2Instance("i-0abcd1234efgh5678", "running");
+		controller.createEC2Instance("i-0b3d181b7eefe0e01", "running");
 
 		// Read
 		controller.readAllEC2Instances();
 
 		// Update
-		controller.updateEC2State("i-0abcd1234efgh5678", "stopped");
+		// controller.updateEC2State("i-0b3d181b7eefe0e01", "stopped");
 
 		// Delete
-		controller.deleteEC2Instance("i-0abcd1234efgh5678");
+		// controller.deleteEC2Instance("i-0abcd1234efgh5678");
 
 		// Read again to verify
 		controller.readAllEC2Instances();
