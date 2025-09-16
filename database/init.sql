@@ -1,0 +1,9 @@
+CREATE DATABASE IF NOT EXISTS ai_ec2_crud;
+
+USE ai_ec2_crud;
+
+CREATE TABLE IF NOT EXISTS ec2_instances (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    instance_id VARCHAR(50) NOT NULL,
+    state VARCHAR(20) NOT NULL
+);
