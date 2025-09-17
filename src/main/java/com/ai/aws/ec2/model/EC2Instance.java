@@ -10,17 +10,16 @@ public class EC2Instance {
 		this.state = state;
 	}
 
-	// getters and setters
 	public String getInstanceId() {
 		return instanceId;
 	}
 
-	public void setInstanceId(String instanceId) {
-		this.instanceId = instanceId;
-	}
-
 	public String getState() {
 		return state;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	public void setState(String state) {
