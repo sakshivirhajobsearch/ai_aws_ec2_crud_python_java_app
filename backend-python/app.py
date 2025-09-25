@@ -1,64 +1,35 @@
 from flask import Flask, request, jsonify
-from ai.predict import predict
-from ec2_operations import create_instance, list_instances, terminate_instance, get_all_instance_details
+from ai.predict import predict_instance_cost
 
 app = Flask(__name__)
 
-# Health check
-@app.route('/', methods=['GET'])
+# ✅ Home route (for testing server status)
+@app.route("/")
 def home():
-    return jsonify({"message": "AI + EC2 Flask API is running."})
+    return "✅ AI EC2 Cost Prediction API is Running!"
 
-# Predict EC2 cost using AI model
-@app.route('/predict', methods=['POST'])
+# ✅ AI cost prediction endpoint
+@app.route("/predict-cost", methods=["GET"])
 def predict_cost():
+    instance_type = request.args.get("instance_type", "t2.micro")
+    region = request.args.get("region", "ap-south-1")
+    
     try:
-        data = request.get_json()
-        hours = float(data.get('hours', 0))
-        predicted_cost = predict(hours)
-        return jsonify({'predicted_cost': round(predicted_cost, 2)})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        usage_hours = float(request.args.get("usage_hours", 24))
+    except ValueError:
+        return jsonify({"error": "Invalid usage_hours"}), 400
 
-# Launch a new EC2 instance
-@app.route('/ec2/create', methods=['POST'])
-def ec2_create():
     try:
-        instance_id = create_instance()
-        return jsonify({'instance_id': instance_id})
+        cost = predict_instance_cost(instance_type, region, usage_hours)
+        return jsonify({
+            "instance_type": instance_type,
+            "region": region,
+            "usage_hours": usage_hours,
+            "predicted_cost": cost
+        })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-# List all EC2 instances (ID + State only)
-@app.route('/ec2/list', methods=['GET'])
-def ec2_list():
-    try:
-        instances = list_instances()
-        return jsonify(instances)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# Get full EC2 instance details
-@app.route('/ec2/details', methods=['GET'])
-def ec2_details():
-    try:
-        details = get_all_instance_details()
-        return jsonify(details)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# Terminate a specific EC2 instance
-@app.route('/ec2/terminate', methods=['POST'])
-def ec2_terminate():
-    try:
-        data = request.get_json()
-        instance_id = data.get('instance_id')
-        if not instance_id:
-            return jsonify({'error': 'Missing instance_id'}), 400
-        result = terminate_instance(instance_id)
-        return jsonify({'message': result})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+# ✅ Start the server
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True, port=5000)
